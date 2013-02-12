@@ -1,0 +1,376 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package databaseConnect;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author Shane
+ */
+
+public class SampleDropAdd extends javax.swing.JFrame {
+    private Statement sqlStatement;
+    private ResultSet sqlResults;
+    private String mySqlUrl;
+    private Connection sqlConnect;
+    
+    public void connectDatabase(){
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            mySqlUrl = "jdbc:mysql://127.0.0.1:3306/sample";
+            sqlConnect = DriverManager.getConnection(mySqlUrl,"root", "");
+            sqlStatement = sqlConnect.createStatement();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.toString());
+//            Logger.getLogger(HenryDrop.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public SampleDropAdd() {
+        initComponents();
+        fillEmployeeList();
+        fillDepartmentsList();
+        fillProjectsList();
+        fetchEmployeeDept();
+        fetchEmployeeProj();
+    }
+    
+    public void fillEmployeeList(){
+        try {
+            connectDatabase();
+            String SQL = "select concat_ws(' ', emp_fname, emp_lname) as empName from employee";
+            sqlResults = sqlStatement.executeQuery(SQL);
+            
+            DefaultComboBoxModel empList = new DefaultComboBoxModel();
+                while(sqlResults.next()){
+                     empList.addElement(sqlResults.getString("empName"));
+                }
+                
+                this.cmbEmployees.setModel(empList);
+                
+                sqlStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SampleDropAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public void fillDepartmentsList(){
+               try {
+            connectDatabase();
+            String SQL = "select dept_name from department";
+            sqlResults = sqlStatement.executeQuery(SQL);
+            
+            DefaultComboBoxModel deptList = new DefaultComboBoxModel();
+                while(sqlResults.next()){
+                     deptList.addElement(sqlResults.getString("dept_name"));
+                }
+                
+                this.cmbDepartments.setModel(deptList);
+                
+                sqlStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SampleDropAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public void fillProjectsList(){
+               try {
+            connectDatabase();
+            String SQL = "select project_name from project";
+            sqlResults = sqlStatement.executeQuery(SQL);
+            
+            DefaultComboBoxModel projList = new DefaultComboBoxModel();
+                while(sqlResults.next()){
+                     projList.addElement(sqlResults.getString("project_name"));
+                }
+                
+                this.cmbProjects.setModel(projList);
+                
+                sqlStatement.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SampleDropAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void fetchEmployeeDept(){
+        connectDatabase();
+        String deptName = cmbDepartments.getSelectedItem().toString();
+        
+        String SQL = "select concat_ws(' ',emp_fname, emp_lname) as fullName "
+                    + "from employee, department "
+                    + "where employee.dept_no = department.dept_no "
+                    + "and department.dept_name = '" + deptName + "'";
+        try {
+            sqlResults = sqlStatement.executeQuery(SQL);
+            DefaultComboBoxModel nameList = new DefaultComboBoxModel();
+                while(sqlResults.next()){
+                     nameList.addElement(sqlResults.getString("fullName"));
+                }
+                
+                this.cmbNameList.setModel(nameList);
+                
+                sqlStatement.close();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(SampleDropAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void fetchEmployeeProj(){
+    connectDatabase();
+    String projName = cmbProjects.getSelectedItem().toString();
+        String SQL = "select concat_ws(' ', emp_fname, emp_lname) as fullName "
+                + "from employee, works_on, project "
+                + "where employee.emp_no = works_on.emp_no "
+                + "and works_on.project_no = project.project_no "
+                + "and project.project_name = '"+ projName +"'";
+        try {
+            sqlResults = sqlStatement.executeQuery(SQL);
+            DefaultComboBoxModel nameList2 = new DefaultComboBoxModel();
+                while(sqlResults.next()){
+                     nameList2.addElement(sqlResults.getString("fullName"));
+                }
+                
+                this.cmbNameList2.setModel(nameList2);
+                
+                sqlStatement.close();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(SampleDropAdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        jSplitPane1 = new javax.swing.JSplitPane();
+        cmbEmployees = new javax.swing.JComboBox();
+        cmbDepartments = new javax.swing.JComboBox();
+        cmbProjects = new javax.swing.JComboBox();
+        panProject = new javax.swing.JLayeredPane();
+        jLabel2 = new javax.swing.JLabel();
+        txtProjName = new javax.swing.JTextField();
+        btnAdd = new javax.swing.JButton();
+        cmbNameList = new javax.swing.JComboBox();
+        cmbNameList2 = new javax.swing.JComboBox();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
+
+        cmbEmployees.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Employees" }));
+
+        cmbDepartments.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Departments" }));
+        cmbDepartments.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cmbDepartmentsMouseClicked(evt);
+            }
+        });
+        cmbDepartments.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbDepartmentsItemStateChanged(evt);
+            }
+        });
+
+        cmbProjects.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Projects" }));
+        cmbProjects.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cmbProjectsMouseClicked(evt);
+            }
+        });
+        cmbProjects.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmbProjectsItemStateChanged(evt);
+            }
+        });
+        cmbProjects.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbProjectsActionPerformed(evt);
+            }
+        });
+
+        panProject.setBackground(new java.awt.Color(153, 153, 255));
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 3, 11)); // NOI18N
+        jLabel2.setText("Enter New Projects Here!");
+        jLabel2.setBounds(50, 0, 150, 14);
+        panProject.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        txtProjName.setBounds(50, 20, 140, 30);
+        panProject.add(txtProjName, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        btnAdd.setText("Add Project");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+        btnAdd.setBounds(50, 60, 140, 23);
+        panProject.add(btnAdd, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmbEmployees, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbDepartments, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbNameList, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(35, 35, 35)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbNameList2, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbProjects, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(panProject, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)))
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbDepartments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbProjects, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(85, 85, 85)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbNameList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbNameList2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(93, 93, 93)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panProject, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbEmployees, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(84, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {                                       
+        String pName = this.txtProjName.getText();
+        int ranbudget = (int) (Math.random() * 1000000 + 1);
+        
+                if(pName.isEmpty()){
+                    JOptionPane.showMessageDialog(this, "Error: empty text box");
+                }
+                
+                connectDatabase();
+                int maxProjects = 0;
+                String SQL = "select max(project_no) from project";
+        try {
+            sqlResults = sqlStatement.executeQuery(SQL);
+            sqlResults.next();
+               maxProjects = sqlResults.getRow() + 1;
+//               maxProjects = sqlResults.getInt(1) + 1;
+            //get() is one based
+//            JOptionPane.showMessageDialog(this, maxProjects + " pk");
+//            
+                     SQL = "insert into project values(" + maxProjects + ", '" + pName + "'" + ",'" + ranbudget +"')";
+
+            JOptionPane.showMessageDialog(this, SQL); //testing purposes
+            boolean notInserted = sqlStatement.execute(SQL);
+            
+                if(notInserted){
+                    JOptionPane.showMessageDialog(this, "Project not inserted!");
+                }
+                
+            sqlStatement.close();
+            
+            fillProjectsList(); //copy to database after close not while another connection is open
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(HenryDrop.class.getName()).log(Level.SEVERE, null, ex);
+        }      
+        
+    }                                      
+
+    private void cmbDepartmentsItemStateChanged(java.awt.event.ItemEvent evt) {                                                
+            fetchEmployeeDept();
+    }                                               
+
+    private void cmbProjectsActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        // TODO add your handling code here:
+    }                                           
+
+    private void cmbProjectsMouseClicked(java.awt.event.MouseEvent evt) {                                         
+
+   
+    }                                        
+
+    private void cmbDepartmentsMouseClicked(java.awt.event.MouseEvent evt) {                                            
+
+    }                                           
+
+    private void cmbProjectsItemStateChanged(java.awt.event.ItemEvent evt) {                                             
+        fetchEmployeeProj();
+    }                                            
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(SampleDropAdd.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(SampleDropAdd.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(SampleDropAdd.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(SampleDropAdd.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new SampleDropAdd().setVisible(true);
+            }
+        });
+    }
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JComboBox cmbDepartments;
+    private javax.swing.JComboBox cmbEmployees;
+    private javax.swing.JComboBox cmbNameList;
+    private javax.swing.JComboBox cmbNameList2;
+    private javax.swing.JComboBox cmbProjects;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JLayeredPane panProject;
+    private javax.swing.JTextField txtProjName;
+    // End of variables declaration                   
+}
